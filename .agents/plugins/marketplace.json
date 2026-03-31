@@ -1,0 +1,20 @@
+{
+  "name": "szmg-local",
+  "interface": {
+    "displayName": "szmg Local Plugins"
+  },
+  "plugins": [
+    {
+      "name": "splat-transform-for-lcc",
+      "source": {
+        "source": "local",
+        "path": "./plugins/splat-transform-for-lcc"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

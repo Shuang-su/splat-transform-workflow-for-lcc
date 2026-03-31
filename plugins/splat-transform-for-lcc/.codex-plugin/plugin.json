@@ -1,0 +1,42 @@
+{
+  "name": "splat-transform-for-lcc",
+  "version": "0.1.0",
+  "description": "Convert LCC scenes into SuperSplat streamed LOD and voxel outputs, merge settings, and mount local viewer routes.",
+  "author": {
+    "name": "szmg",
+    "email": "noreply@example.com",
+    "url": "https://github.com/"
+  },
+  "homepage": "https://github.com/your-account/splat-transform-for-lcc",
+  "repository": "https://github.com/your-account/splat-transform-for-lcc",
+  "license": "MIT",
+  "keywords": [
+    "supersplat",
+    "lcc",
+    "gaussian-splatting",
+    "viewer",
+    "codex"
+  ],
+  "skills": "./skills/",
+  "apps": "./.app.json",
+  "interface": {
+    "displayName": "Splat Transform for LCC",
+    "shortDescription": "Convert LCC scenes, merge settings, and mount local viewer routes.",
+    "longDescription": "Use this plugin to convert XGRIDS or 其域 LCC scenes into SuperSplat streamed LOD and voxel outputs, merge v1 and v2 settings JSON files, preserve or strip environment data, and mount scenes into a local SuperSplat viewer route.",
+    "developerName": "szmg",
+    "category": "Coding",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "websiteURL": "https://github.com/your-account/splat-transform-for-lcc",
+    "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
+    "termsOfServiceURL": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
+    "defaultPrompt": [
+      "Convert this LCC scene into streamed LOD and voxel output with the default workflow.",
+      "Merge these settings JSON files into a version 2 viewer settings file.",
+      "Mount this converted scene into a local SuperSplat viewer route."
+    ],
+    "brandColor": "#2E86DE"
+  }
+}

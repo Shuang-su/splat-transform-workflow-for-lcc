@@ -1,0 +1,4 @@
+interface:
+  display_name: "SuperSplat Workflow"
+  short_description: "Convert LCC scenes, explain defaults, merge settings, and mount local viewer routes."
+  default_prompt: "Convert this LCC scene with the default workflow, explain the default rotation and voxel parameters, merge the settings JSON files if needed, and mount the result into a local SuperSplat viewer route."

@@ -1,0 +1,10 @@
+{
+  "splat-transform": {
+    "upstream": "https://github.com/playcanvas/splat-transform.git",
+    "baseCommit": "c0b1661"
+  },
+  "supersplat-viewer": {
+    "upstream": "https://github.com/playcanvas/supersplat-viewer.git",
+    "baseCommit": "cf1ae4f"
+  }
+}
