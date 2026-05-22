@@ -224,9 +224,10 @@ ClawHub is the publishing registry for OpenClaw skills. Tencent SkillHub is trea
 ClawHub CLI publishing can use:
 
 ```bash
-cd /Users/szmg/Documents/codex-supersplat-workflow
 npm_config_cache=/tmp/codex-npm-cache npx clawhub login
-npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish skills/supersplat-workflow \
+npm_config_cache=/tmp/codex-npm-cache npx clawhub \
+  --workdir /Users/szmg/Documents/codex-supersplat-workflow \
+  skill publish skills/supersplat-workflow \
   --slug supersplat-workflow \
   --name "SuperSplat Workflow / LCC 转 SuperSplat" \
   --version 0.2.1 \
@@ -237,14 +238,20 @@ npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish skills/superspla
 If you are already in another working directory, pass the absolute skill folder path instead:
 
 ```bash
-npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish /Users/szmg/Documents/codex-supersplat-workflow/skills/supersplat-workflow \
+npm_config_cache=/tmp/codex-npm-cache npx clawhub \
+  --workdir /Users/szmg/Documents/codex-supersplat-workflow \
+  skill publish /Users/szmg/Documents/codex-supersplat-workflow/skills/supersplat-workflow \
   --slug supersplat-workflow \
   --name "SuperSplat Workflow / LCC 转 SuperSplat" \
   --version 0.2.1 \
   --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN
 ```
 
+The explicit `--workdir` is intentional. ClawHub may resolve relative paths against an OpenClaw default workspace instead of the shell's current directory.
+
 The GitHub repo is the source of truth. Platform account login, ownership verification, Tencent SkillHub mirror status, and final public listing submission must be completed in the target platform's authenticated flow.
+
+Tencent's `skillhub.cn` installer currently provides a local search/install CLI (`search`, `install`, `upgrade`, `list`, `login`, `logout`, `config`) and does not expose a public `publish` command. Publish through ClawHub first, then verify Tencent SkillHub search/mirror status.
 
 ## Included demos
 

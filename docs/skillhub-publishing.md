@@ -34,9 +34,10 @@ This skill helps users convert LCC/PLY Gaussian splat scenes into deployable Sup
 The official ClawHub CLI publishes a skill from a folder, not from an isolated `SKILL.md` file:
 
 ```bash
-cd /Users/szmg/Documents/codex-supersplat-workflow
 npm_config_cache=/tmp/codex-npm-cache npx clawhub login
-npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish skills/supersplat-workflow \
+npm_config_cache=/tmp/codex-npm-cache npx clawhub \
+  --workdir /Users/szmg/Documents/codex-supersplat-workflow \
+  skill publish skills/supersplat-workflow \
   --slug supersplat-workflow \
   --name "SuperSplat Workflow / LCC 转 SuperSplat" \
   --version 0.2.1 \
@@ -47,7 +48,9 @@ npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish skills/superspla
 If your shell is in another directory, pass the absolute skill folder path:
 
 ```bash
-npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish /Users/szmg/Documents/codex-supersplat-workflow/skills/supersplat-workflow \
+npm_config_cache=/tmp/codex-npm-cache npx clawhub \
+  --workdir /Users/szmg/Documents/codex-supersplat-workflow \
+  skill publish /Users/szmg/Documents/codex-supersplat-workflow/skills/supersplat-workflow \
   --slug supersplat-workflow \
   --name "SuperSplat Workflow / LCC 转 SuperSplat" \
   --version 0.2.1 \
@@ -57,8 +60,9 @@ npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish /Users/szmg/Docu
 If publishing under an organization or publisher handle:
 
 ```bash
-cd /Users/szmg/Documents/codex-supersplat-workflow
-npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish skills/supersplat-workflow \
+npm_config_cache=/tmp/codex-npm-cache npx clawhub \
+  --workdir /Users/szmg/Documents/codex-supersplat-workflow \
+  skill publish skills/supersplat-workflow \
   --owner <publisher-handle> \
   --slug supersplat-workflow \
   --name "SuperSplat Workflow / LCC 转 SuperSplat" \
@@ -66,7 +70,9 @@ npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish skills/superspla
   --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN
 ```
 
-Actual publication requires an authenticated ClawHub account. On this machine `npx clawhub whoami` returned `Not logged in. Run: clawhub login`, so the repo can be prepared and pushed but the public registry publish step must be run after login.
+Actual publication requires an authenticated ClawHub account. This repo has been published as `supersplat-workflow@0.2.1`; future updates should bump `--version` and rerun `clawhub skill publish`.
+
+The explicit `--workdir` is required in this repo. `clawhub` can resolve relative publish paths against an OpenClaw default workspace instead of the shell's current directory; without `--workdir`, `skills/supersplat-workflow` can incorrectly fail with `Path must be a folder`.
 
 ## Tencent SkillHub flow / 腾讯 SkillHub 流程
 
@@ -82,6 +88,14 @@ Recommended process:
 2. Open Tencent SkillHub and search for `supersplat-workflow` or related tags after the registry has synchronized.
 3. If the listing is not mirrored, submit the GitHub repo or ClawHub listing through Tencent SkillHub's authenticated web/community flow.
 4. Keep the listing text bilingual so Chinese users understand both the value and the terms.
+
+Tencent's installer:
+
+```bash
+curl -fsSL https://skillhub.cn/install/install.sh | bash -s -- --no-skills
+```
+
+installs a local `skillhub` CLI for search/install and enterprise-source login. The extracted CLI currently exposes `search`, `install`, `upgrade`, `list`, `self-upgrade`, `login`, `logout`, and `config`; it does not expose a public `publish` command. Treat Tencent SkillHub as the discovery/install side unless Tencent provides a separate authenticated publishing channel.
 
 Recommended listing summary:
 
