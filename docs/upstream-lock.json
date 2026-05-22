@@ -1,7 +1,15 @@
 {
-  "splat-transform": {
+  "splat-transform-1.9.2": {
     "upstream": "https://github.com/playcanvas/splat-transform.git",
-    "baseCommit": "c0b1661"
+    "baseCommit": "c0b1661",
+    "version": "1.9.2",
+    "role": "legacy workflow reference"
+  },
+  "splat-transform-2.1.1": {
+    "upstream": "https://github.com/playcanvas/splat-transform.git",
+    "baseCommit": "bebac61",
+    "version": "2.1.1",
+    "role": "current default workflow source"
   },
   "supersplat-viewer": {
     "upstream": "https://github.com/playcanvas/supersplat-viewer.git",

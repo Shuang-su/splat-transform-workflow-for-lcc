@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import json
 import os
+import re
 import shlex
 import shutil
 import subprocess
@@ -12,13 +13,16 @@ import sys
 from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).resolve().parent
+REPO_ROOT = SCRIPT_DIR.parents[2]
 sys.path.insert(0, str(SCRIPT_DIR))
 
 from merge_settings import convert_v1_to_v2, merge_settings  # noqa: E402
 
 
-def run(cmd, env=None):
+def run(cmd, env=None, dry_run=False):
     print("+", " ".join(shlex.quote(part) for part in cmd))
+    if dry_run:
+        return
     subprocess.run(cmd, check=True, env=env)
 
 
@@ -39,20 +43,124 @@ def resolve_cli(path_value: str) -> Path:
     return cli
 
 
-def slug_value(value: str) -> str:
+def default_splat_transform_dir() -> str:
+    env_value = os.environ.get("SPLAT_TRANSFORM_DIR")
+    if env_value:
+        return env_value
+
+    repo_local = REPO_ROOT / "splat-transform-2.1.1"
+    if repo_local.exists():
+        return str(repo_local)
+
+    return "~/Documents/splat-transform"
+
+
+def cli_root(cli: Path) -> Path:
+    if cli.name == "cli.mjs" and cli.parent.name == "bin":
+        return cli.parent.parent
+    return cli.parent
+
+
+def parse_major_version(text: str) -> int | None:
+    match = re.search(r"\bv?(\d+)\.(\d+)\.(\d+)\b", text)
+    return int(match.group(1)) if match else None
+
+
+def detect_splat_transform_major(cli: Path, override: str, env) -> int:
+    if override != "auto":
+        return int(override)
+
+    try:
+        result = subprocess.run(
+            ["node", str(cli), "--version"],
+            check=True,
+            capture_output=True,
+            text=True,
+            env=env,
+        )
+        major = parse_major_version(result.stdout + result.stderr)
+        if major is not None:
+            return major
+    except subprocess.CalledProcessError:
+        pass
+
+    package_json = cli_root(cli) / "package.json"
+    if package_json.exists():
+        major = parse_major_version(load_json(package_json).get("version", ""))
+        if major is not None:
+            return major
+
+    raise RuntimeError(f"Unable to detect splat-transform major version for {cli}")
+
+
+def path_kind(path: Path) -> str:
+    suffix = path.suffix.lower()
+    if suffix == ".lcc":
+        return "lcc"
+    if suffix == ".ply":
+        return "ply"
+    return suffix[1:] or "input"
+
+
+def slug_value(value: str | None) -> str:
+    if value is None:
+        return "none"
     return value.replace(",", "_")
 
 
-def lod_dir_name(rotation: str, translate: str | None, remove_environment: bool) -> str:
-    prefix = "supersplat_lod_noenv_" if remove_environment else "supersplat_lod_"
-    name = prefix + "rot" + slug_value(rotation)
+def rotation_label(value: str | None) -> str:
+    return "rot_none" if value is None else "rot" + slug_value(value)
+
+
+def fmt_float(value: float) -> str:
+    return f"{value:.2f}"
+
+
+def effective_rotation(value: str, source_kind: str, output_kind: str, major: int) -> str | None:
+    lowered = value.lower()
+    if lowered == "none":
+        return None
+    if lowered != "auto":
+        return value
+
+    if output_kind == "voxel":
+        if major >= 2:
+            return "-90,0,180" if source_kind == "ply" else None
+        return "90,0,0"
+
+    if source_kind == "lcc" and major >= 2:
+        return None
+    return "90,0,0"
+
+
+def append_transform_actions(cmd: list[str], rotation: str | None, translate: str | None):
+    if rotation:
+        cmd += ["-r", rotation]
+    if translate:
+        cmd += ["-t", translate]
+
+
+def stream_dir_name(source_kind: str, rotation: str | None, translate: str | None, remove_environment: bool) -> str:
+    prefix = "streamed_noenv" if remove_environment else "streamed"
+    name = f"{prefix}_{source_kind}_{rotation_label(rotation)}"
     if translate:
         name += "_trans" + slug_value(translate)
     return name
 
 
-def voxel_dir_name(voxel_lod: int, voxel_resolution: float, voxel_alpha: float, rotation: str, translate: str | None) -> str:
-    name = f"voxel_lod{voxel_lod}_r{voxel_resolution:.2f}_a{voxel_alpha:.2f}_rot{slug_value(rotation)}"
+def sog_dir_name(source_kind: str, rotation: str | None, translate: str | None) -> str:
+    name = f"sog_{source_kind}_{rotation_label(rotation)}"
+    if translate:
+        name += "_trans" + slug_value(translate)
+    return name
+
+
+def voxel_dir_name(source_kind: str, voxel_lod: int, voxel_resolution: float, voxel_alpha: float, rotation: str | None, translate: str | None) -> str:
+    baked = f"baked-r{slug_value(rotation)}" if rotation else "identity"
+    name = (
+        f"voxel_{source_kind}_lod{voxel_lod}_"
+        f"r{fmt_float(voxel_resolution)}_a{fmt_float(voxel_alpha)}_{baked}"
+    )
     if translate:
         name += "_trans" + slug_value(translate)
     return name
@@ -77,58 +185,79 @@ def voxel_bin_from_json(voxel_json: Path) -> Path:
 
 def convert_scene(args):
     cli = resolve_cli(args.splat_transform)
-    input_lcc = Path(args.input_lcc).expanduser().resolve()
+    stream_input = Path(args.stream_input).expanduser().resolve()
+    sog_input = Path(args.sog_input).expanduser().resolve() if args.sog_input else stream_input
+    voxel_input = Path(args.voxel_input).expanduser().resolve() if args.voxel_input else sog_input
     output_root = Path(args.output_root).expanduser().resolve()
-    output_root.mkdir(parents=True, exist_ok=True)
-
-    streamed_dir = output_root / lod_dir_name(args.rotation, args.translate, args.remove_environment)
-    voxel_dir = output_root / voxel_dir_name(
-        args.voxel_lod,
-        args.voxel_resolution,
-        args.voxel_alpha,
-        args.rotation,
-        args.translate,
-    )
-
-    lod_meta = streamed_dir / "lod-meta.json"
-    voxel_json = voxel_dir / f"{input_lcc.stem}.voxel.json"
+    if not args.dry_run:
+        output_root.mkdir(parents=True, exist_ok=True)
 
     env = os.environ.copy()
     if args.node_memory:
         env["NODE_OPTIONS"] = f"--max-old-space-size={args.node_memory}"
 
-    lod_cmd = ["node", str(cli), "-w", str(input_lcc), "-r", args.rotation]
-    if args.translate:
-        lod_cmd += ["-t", args.translate]
-    lod_cmd += [str(lod_meta)]
-    run(lod_cmd, env=env)
+    major = detect_splat_transform_major(cli, args.splat_transform_major, env)
+    stream_kind = path_kind(stream_input)
+    sog_kind = path_kind(sog_input)
+    voxel_kind = path_kind(voxel_input)
+
+    stream_rotation = effective_rotation(args.stream_rotation, stream_kind, "stream", major)
+    sog_rotation = effective_rotation(args.sog_rotation, sog_kind, "sog", major)
+    voxel_rotation = effective_rotation(args.voxel_rotation, voxel_kind, "voxel", major)
+
+    streamed_dir = output_root / stream_dir_name(stream_kind, stream_rotation, args.translate, args.remove_environment)
+    sog_dir = output_root / sog_dir_name(sog_kind, sog_rotation, args.translate)
+    voxel_dir = output_root / voxel_dir_name(
+        voxel_kind,
+        args.voxel_lod,
+        args.voxel_resolution,
+        args.voxel_alpha,
+        voxel_rotation,
+        args.translate,
+    )
+
+    lod_meta = streamed_dir / "lod-meta.json"
+    sog_output = sog_dir / "scene.sog"
+    voxel_json = voxel_dir / "walk.voxel.json"
+
+    stream_cmd = ["node", str(cli), "-w", str(stream_input)]
+    if stream_kind == "ply" and args.stream_ply_lod.lower() != "none":
+        stream_cmd += ["-l", args.stream_ply_lod]
+    append_transform_actions(stream_cmd, stream_rotation, args.translate)
+    stream_cmd += [str(lod_meta)]
+    run(stream_cmd, env=env, dry_run=args.dry_run)
 
     if args.remove_environment:
-        strip_environment(streamed_dir)
+        if args.dry_run:
+            print(f"would_strip_environment={streamed_dir}")
+        else:
+            strip_environment(streamed_dir)
 
-    voxel_cmd = [
-        "node",
-        str(cli),
-        "-w",
-        "-O",
-        str(args.voxel_lod),
-        "-R",
-        str(args.voxel_resolution),
-        "-A",
-        str(args.voxel_alpha),
-        str(input_lcc),
-        "-r",
-        args.rotation,
-    ]
-    if args.translate:
-        voxel_cmd += ["-t", args.translate]
+    sog_cmd = ["node", str(cli), "-w", str(sog_input)]
+    append_transform_actions(sog_cmd, sog_rotation, args.translate)
+    sog_cmd += [str(sog_output)]
+    run(sog_cmd, env=env, dry_run=args.dry_run)
+
+    voxel_cmd = ["node", str(cli), "-w"]
+    if major >= 2:
+        if voxel_kind == "lcc":
+            voxel_cmd += ["--lod-select", str(args.voxel_lod)]
+        voxel_cmd += ["--voxel-params", f"{fmt_float(args.voxel_resolution)},{fmt_float(args.voxel_alpha)}"]
+    else:
+        if voxel_kind == "lcc":
+            voxel_cmd += ["-O", str(args.voxel_lod)]
+        voxel_cmd += ["-R", fmt_float(args.voxel_resolution), "-A", fmt_float(args.voxel_alpha)]
+    voxel_cmd += [str(voxel_input)]
+    append_transform_actions(voxel_cmd, voxel_rotation, args.translate)
     voxel_cmd += [str(voxel_json)]
-    run(voxel_cmd, env=env)
+    run(voxel_cmd, env=env, dry_run=args.dry_run)
 
+    print(f"splat_transform_major={major}")
     print(f"streamed_lod={lod_meta}")
+    print(f"sog={sog_output}")
     print(f"voxel_json={voxel_json}")
     print(f"voxel_bin={voxel_bin_from_json(voxel_json)}")
-    return streamed_dir, voxel_json
+    return streamed_dir, voxel_json, sog_output
 
 
 def mount_viewer(args):
@@ -189,13 +318,22 @@ def deploy_scene(args):
     if settings_output is None:
         settings_output = v1_settings.parent / ("settings-merged.json" if args.base_v2 else "settings-v2.json")
 
-    if args.base_v2:
-        merged = merge_settings(v1_settings, Path(args.base_v2).expanduser().resolve())
+    if args.dry_run:
+        print(f"would_write_settings={settings_output}")
     else:
-        merged = convert_v1_to_v2(v1_settings)
-    write_json(settings_output, merged)
+        if args.base_v2:
+            merged = merge_settings(v1_settings, Path(args.base_v2).expanduser().resolve())
+        else:
+            merged = convert_v1_to_v2(v1_settings)
+        write_json(settings_output, merged)
 
-    streamed_dir, voxel_json = convert_scene(args)
+    streamed_dir, voxel_json, sog_output = convert_scene(args)
+
+    if args.dry_run:
+        print(f"would_mount_viewer={args.scene_key}")
+        print(f"settings={settings_output}")
+        print(f"sog={sog_output}")
+        return
 
     mount_args = argparse.Namespace(
         scene_key=args.scene_key,
@@ -208,6 +346,7 @@ def deploy_scene(args):
     route_dir = mount_viewer(mount_args)
 
     print(f"settings={settings_output}")
+    print(f"sog={sog_output}")
     print(f"route={route_dir}")
 
 
@@ -215,7 +354,7 @@ def build_parser():
     parser = argparse.ArgumentParser(
         description=(
             "Reusable SuperSplat scene workflow. Default deploy values are: "
-            "rotation=90,0,0, voxel-lod=0, voxel-resolution=0.08, voxel-alpha=0.20."
+            "PLY-first SOG/voxel, LCC-first streamed LOD, voxel-resolution=0.08, voxel-alpha=0.20."
         )
     )
     subparsers = parser.add_subparsers(dest="command", required=True)
@@ -234,13 +373,29 @@ def build_parser():
 
     convert_parser = subparsers.add_parser(
         "convert-scene",
-        help="Generate streamed LOD and LOD0 voxel output from an LCC scene.",
+        help="Generate streamed LOD, SOG, and voxel outputs from LCC/PLY inputs.",
     )
-    convert_parser.add_argument("input_lcc")
+    convert_parser.add_argument("stream_input")
     convert_parser.add_argument("output_root")
-    convert_parser.add_argument("--splat-transform", default=os.environ.get("SPLAT_TRANSFORM_DIR", "~/Documents/splat-transform"))
-    convert_parser.add_argument("--rotation", default="90,0,0", help="Scene rotation, default: 90,0,0")
+    convert_parser.add_argument("--sog-input", help="Optional high-precision source for scene.sog; prefer PLY when available.")
+    convert_parser.add_argument("--voxel-input", help="Optional high-precision source for walk.voxel.json; prefer PLY when available.")
+    convert_parser.add_argument("--splat-transform", default=default_splat_transform_dir())
+    convert_parser.add_argument("--splat-transform-major", choices=["auto", "1", "2"], default="auto")
+    convert_parser.add_argument(
+        "--stream-rotation",
+        "--rotation",
+        dest="stream_rotation",
+        default="auto",
+        help="Streamed LOD rotation: auto, none, or x,y,z. --rotation is kept as a legacy alias.",
+    )
+    convert_parser.add_argument("--sog-rotation", default="auto", help="SOG rotation: auto, none, or x,y,z.")
+    convert_parser.add_argument("--voxel-rotation", default="auto", help="Voxel rotation: auto, none, or x,y,z.")
     convert_parser.add_argument("--translate", help="Optional scene translation")
+    convert_parser.add_argument(
+        "--stream-ply-lod",
+        default="0",
+        help="LOD tag to add when stream_input is PLY; use 'none' only when the PLY already has a lod column.",
+    )
     convert_parser.add_argument("--voxel-lod", type=int, default=0, help="Voxel source LOD, default: 0")
     convert_parser.add_argument(
         "--voxel-resolution",
@@ -256,6 +411,7 @@ def build_parser():
     )
     convert_parser.add_argument("--node-memory", type=int, default=65536)
     convert_parser.add_argument("--remove-environment", action="store_true")
+    convert_parser.add_argument("--dry-run", action="store_true", help="Print commands without writing outputs.")
     convert_parser.set_defaults(func=convert_scene)
 
     mount_parser = subparsers.add_parser("mount-viewer", help="Copy scene outputs into a supersplat-viewer public route.")
@@ -269,19 +425,35 @@ def build_parser():
 
     deploy_parser = subparsers.add_parser(
         "deploy-scene",
-        help="Merge settings, convert the scene, and mount a viewer route with the default LCC workflow.",
+        help="Merge settings, convert streamed/SOG/voxel outputs, and mount a viewer route.",
     )
     deploy_parser.add_argument("scene_key")
-    deploy_parser.add_argument("input_lcc")
+    deploy_parser.add_argument("stream_input")
     deploy_parser.add_argument("output_root")
     deploy_parser.add_argument("viewer_public")
     deploy_parser.add_argument("v1_settings")
     deploy_parser.add_argument("--base-v2")
     deploy_parser.add_argument("--settings-output")
     deploy_parser.add_argument("--title")
-    deploy_parser.add_argument("--splat-transform", default=os.environ.get("SPLAT_TRANSFORM_DIR", "~/Documents/splat-transform"))
-    deploy_parser.add_argument("--rotation", default="90,0,0", help="Scene rotation, default: 90,0,0")
+    deploy_parser.add_argument("--sog-input", help="Optional high-precision source for scene.sog; prefer PLY when available.")
+    deploy_parser.add_argument("--voxel-input", help="Optional high-precision source for walk.voxel.json; prefer PLY when available.")
+    deploy_parser.add_argument("--splat-transform", default=default_splat_transform_dir())
+    deploy_parser.add_argument("--splat-transform-major", choices=["auto", "1", "2"], default="auto")
+    deploy_parser.add_argument(
+        "--stream-rotation",
+        "--rotation",
+        dest="stream_rotation",
+        default="auto",
+        help="Streamed LOD rotation: auto, none, or x,y,z. --rotation is kept as a legacy alias.",
+    )
+    deploy_parser.add_argument("--sog-rotation", default="auto", help="SOG rotation: auto, none, or x,y,z.")
+    deploy_parser.add_argument("--voxel-rotation", default="auto", help="Voxel rotation: auto, none, or x,y,z.")
     deploy_parser.add_argument("--translate", help="Optional scene translation")
+    deploy_parser.add_argument(
+        "--stream-ply-lod",
+        default="0",
+        help="LOD tag to add when stream_input is PLY; use 'none' only when the PLY already has a lod column.",
+    )
     deploy_parser.add_argument("--voxel-lod", type=int, default=0, help="Voxel source LOD, default: 0")
     deploy_parser.add_argument(
         "--voxel-resolution",
@@ -297,6 +469,7 @@ def build_parser():
     )
     deploy_parser.add_argument("--node-memory", type=int, default=65536)
     deploy_parser.add_argument("--remove-environment", action="store_true")
+    deploy_parser.add_argument("--dry-run", action="store_true", help="Print commands without writing outputs.")
     deploy_parser.set_defaults(func=deploy_scene)
 
     return parser
