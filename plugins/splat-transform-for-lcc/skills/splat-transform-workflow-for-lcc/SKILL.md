@@ -1,17 +1,17 @@
 ---
-name: supersplat-workflow
+name: splat-transform-workflow-for-lcc
 description: Use when converting XGRIDS/其域 `.lcc` or PLY Gaussian splat scenes for SuperSplat, producing streamed LOD, SOG, voxel collision data, merging viewer settings, mounting local routes, or explaining LCC/SuperSplat workflow concepts to Chinese or English users.
-version: 0.2.1
+version: 0.2.2
 metadata:
   openclaw:
-    homepage: https://github.com/Shuang-su/splat-transform_for_lcc
+    homepage: https://github.com/Shuang-su/splat-transform-workflow-for-lcc
     requires:
       bins:
         - python3
         - node
 ---
 
-# SuperSplat Workflow / SuperSplat 工作流
+# Splat Transform Workflow for LCC / LCC 转 SuperSplat 工作流
 
 Use this skill for LCC/PLY to SuperSplat conversion work. It explains the formats, chooses precision-preserving defaults, and uses the bundled scripts instead of retyping fragile `splat-transform` commands by hand.
 
@@ -205,5 +205,5 @@ The route redirects to the root viewer with `settings`, `content`, and `voxel` q
 
 - Keep this file usable as a standalone `SKILL.md`; ClawHub publishes from a skill folder that contains this file.
 - Keep the repo-local plugin metadata in `plugins/splat-transform-for-lcc/.codex-plugin/plugin.json` aligned with this skill.
-- The top-level `skills/supersplat-workflow/SKILL.md` mirrors this plugin skill for scanners that expect a repository-level `skills/` directory.
+- The top-level `skills/splat-transform-workflow-for-lcc/SKILL.md` mirrors this plugin skill for scanners that expect a repository-level `skills/` directory.
 - Tencent SkillHub is treated as the China-optimized discovery/mirror layer for ClawHub content. Publish to ClawHub first, then verify whether SkillHub has mirrored or accepted the listing.

@@ -3,7 +3,7 @@
 This repo is prepared for two publishing shapes:
 
 - Codex plugin: `plugins/splat-transform-for-lcc/`
-- Standalone skill folder: `skills/supersplat-workflow/`
+- Standalone skill folder: `skills/splat-transform-workflow-for-lcc/`
 
 The standalone folder mirrors the plugin skill so ClawHub, Tencent SkillHub, or other OpenClaw-compatible scanners can discover it without understanding Codex plugin metadata.
 
@@ -35,12 +35,13 @@ The official ClawHub CLI publishes a skill from a folder, not from an isolated `
 
 ```bash
 npm_config_cache=/tmp/codex-npm-cache npx clawhub login
+cd /path/to/splat-transform-workflow-for-lcc
 npm_config_cache=/tmp/codex-npm-cache npx clawhub \
-  --workdir /Users/szmg/Documents/codex-supersplat-workflow \
-  skill publish skills/supersplat-workflow \
-  --slug supersplat-workflow \
-  --name "SuperSplat Workflow / LCC 转 SuperSplat" \
-  --version 0.2.1 \
+  --workdir "$PWD" \
+  skill publish skills/splat-transform-workflow-for-lcc \
+  --slug splat-transform-workflow-for-lcc \
+  --name "Splat Transform Workflow for LCC / LCC 转 SuperSplat" \
+  --version 0.2.2 \
   --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN \
   --changelog "Add bilingual glossary, LCC/SuperSplat concept explanations, and PLY-first conversion guidance."
 ```
@@ -48,44 +49,46 @@ npm_config_cache=/tmp/codex-npm-cache npx clawhub \
 If your shell is in another directory, pass the absolute skill folder path:
 
 ```bash
+REPO_DIR=/path/to/splat-transform-workflow-for-lcc
 npm_config_cache=/tmp/codex-npm-cache npx clawhub \
-  --workdir /Users/szmg/Documents/codex-supersplat-workflow \
-  skill publish /Users/szmg/Documents/codex-supersplat-workflow/skills/supersplat-workflow \
-  --slug supersplat-workflow \
-  --name "SuperSplat Workflow / LCC 转 SuperSplat" \
-  --version 0.2.1 \
+  --workdir "$REPO_DIR" \
+  skill publish "$REPO_DIR/skills/splat-transform-workflow-for-lcc" \
+  --slug splat-transform-workflow-for-lcc \
+  --name "Splat Transform Workflow for LCC / LCC 转 SuperSplat" \
+  --version 0.2.2 \
   --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN
 ```
 
 If publishing under an organization or publisher handle:
 
 ```bash
+cd /path/to/splat-transform-workflow-for-lcc
 npm_config_cache=/tmp/codex-npm-cache npx clawhub \
-  --workdir /Users/szmg/Documents/codex-supersplat-workflow \
-  skill publish skills/supersplat-workflow \
+  --workdir "$PWD" \
+  skill publish skills/splat-transform-workflow-for-lcc \
   --owner <publisher-handle> \
-  --slug supersplat-workflow \
-  --name "SuperSplat Workflow / LCC 转 SuperSplat" \
-  --version 0.2.1 \
+  --slug splat-transform-workflow-for-lcc \
+  --name "Splat Transform Workflow for LCC / LCC 转 SuperSplat" \
+  --version 0.2.2 \
   --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN
 ```
 
-Actual publication requires an authenticated ClawHub account. This repo has been published as `supersplat-workflow@0.2.1`; future updates should bump `--version` and rerun `clawhub skill publish`.
+Actual publication requires an authenticated ClawHub account. This repo has been published as `splat-transform-workflow-for-lcc@0.2.2`; future updates should bump `--version` and rerun `clawhub skill publish`.
 
-The explicit `--workdir` is required in this repo. `clawhub` can resolve relative publish paths against an OpenClaw default workspace instead of the shell's current directory; without `--workdir`, `skills/supersplat-workflow` can incorrectly fail with `Path must be a folder`.
+The explicit `--workdir` is required in this repo. `clawhub` can resolve relative publish paths against an OpenClaw default workspace instead of the shell's current directory; without `--workdir`, `skills/splat-transform-workflow-for-lcc` can incorrectly fail with `Path must be a folder`.
 
 ## Tencent SkillHub flow / 腾讯 SkillHub 流程
 
 For Tencent SkillHub, use this repo as the source of truth:
 
 ```text
-https://github.com/Shuang-su/splat-transform_for_lcc
+https://github.com/Shuang-su/splat-transform-workflow-for-lcc
 ```
 
 Recommended process:
 
 1. Publish or update the skill on ClawHub with the CLI above.
-2. Open Tencent SkillHub and search for `supersplat-workflow` or related tags after the registry has synchronized.
+2. Open Tencent SkillHub and search for `splat-transform-workflow-for-lcc` or related tags after the registry has synchronized.
 3. If the listing is not mirrored, submit the GitHub repo or ClawHub listing through Tencent SkillHub's authenticated web/community flow.
 4. Keep the listing text bilingual so Chinese users understand both the value and the terms.
 
@@ -111,7 +114,7 @@ Recommended Chinese summary:
 
 ## Release checklist
 
-1. Keep `plugins/splat-transform-for-lcc/skills/supersplat-workflow/SKILL.md` and `skills/supersplat-workflow/SKILL.md` in sync.
+1. Keep `plugins/splat-transform-for-lcc/skills/splat-transform-workflow-for-lcc/SKILL.md` and `skills/splat-transform-workflow-for-lcc/SKILL.md` in sync.
 2. Validate JSON metadata:
 
 ```bash

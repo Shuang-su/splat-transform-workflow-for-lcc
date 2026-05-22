@@ -31,9 +31,9 @@ splat-transform-for-lcc/
 │       │   ├── merge_settings.py
 │       │   └── scene_workflow.py
 │       └── skills/
-│           └── supersplat-workflow/
+│           └── splat-transform-workflow-for-lcc/
 ├── skills/
-│   └── supersplat-workflow/
+│   └── splat-transform-workflow-for-lcc/
 ├── splat-transform-1.9.2/
 ├── splat-transform-2.1.1/
 └── supersplat-viewer/
@@ -198,7 +198,7 @@ python3 plugins/splat-transform-for-lcc/scripts/scene_workflow.py deploy-scene \
 ./install_skill.sh
 ```
 
-That creates a symlink at `~/.codex/skills/supersplat-workflow`.
+That creates a symlink at `~/.codex/skills/splat-transform-workflow-for-lcc`.
 
 4. Make sure the machine has:
    - `python3`
@@ -210,13 +210,13 @@ That creates a symlink at `~/.codex/skills/supersplat-workflow`.
 The plugin skill is stored at:
 
 ```text
-plugins/splat-transform-for-lcc/skills/supersplat-workflow/SKILL.md
+plugins/splat-transform-for-lcc/skills/splat-transform-workflow-for-lcc/SKILL.md
 ```
 
 For platforms that scan a repo-level skill directory, the same content is mirrored at:
 
 ```text
-skills/supersplat-workflow/SKILL.md
+skills/splat-transform-workflow-for-lcc/SKILL.md
 ```
 
 ClawHub is the publishing registry for OpenClaw skills. Tencent SkillHub is treated here as the China-optimized discovery and mirror layer for ClawHub content, so publish to ClawHub first and then verify whether the listing appears in Tencent SkillHub or submit through Tencent's web/community flow when that entry is available.
@@ -225,12 +225,13 @@ ClawHub CLI publishing can use:
 
 ```bash
 npm_config_cache=/tmp/codex-npm-cache npx clawhub login
+cd /path/to/splat-transform-workflow-for-lcc
 npm_config_cache=/tmp/codex-npm-cache npx clawhub \
-  --workdir /Users/szmg/Documents/codex-supersplat-workflow \
-  skill publish skills/supersplat-workflow \
-  --slug supersplat-workflow \
-  --name "SuperSplat Workflow / LCC 转 SuperSplat" \
-  --version 0.2.1 \
+  --workdir "$PWD" \
+  skill publish skills/splat-transform-workflow-for-lcc \
+  --slug splat-transform-workflow-for-lcc \
+  --name "Splat Transform Workflow for LCC / LCC 转 SuperSplat" \
+  --version 0.2.2 \
   --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN \
   --changelog "Add bilingual glossary, LCC/SuperSplat concept explanations, and PLY-first conversion guidance."
 ```
@@ -238,12 +239,13 @@ npm_config_cache=/tmp/codex-npm-cache npx clawhub \
 If you are already in another working directory, pass the absolute skill folder path instead:
 
 ```bash
+REPO_DIR=/path/to/splat-transform-workflow-for-lcc
 npm_config_cache=/tmp/codex-npm-cache npx clawhub \
-  --workdir /Users/szmg/Documents/codex-supersplat-workflow \
-  skill publish /Users/szmg/Documents/codex-supersplat-workflow/skills/supersplat-workflow \
-  --slug supersplat-workflow \
-  --name "SuperSplat Workflow / LCC 转 SuperSplat" \
-  --version 0.2.1 \
+  --workdir "$REPO_DIR" \
+  skill publish "$REPO_DIR/skills/splat-transform-workflow-for-lcc" \
+  --slug splat-transform-workflow-for-lcc \
+  --name "Splat Transform Workflow for LCC / LCC 转 SuperSplat" \
+  --version 0.2.2 \
   --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN
 ```
 

@@ -1,14 +1,14 @@
 {
   "name": "splat-transform-for-lcc",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Convert LCC/PLY Gaussian splat scenes into SuperSplat streamed LOD, SOG, and voxel outputs with bilingual guidance.",
   "author": {
     "name": "szmg",
     "email": "noreply@example.com",
     "url": "https://github.com/Shuang-su"
   },
-  "homepage": "https://github.com/Shuang-su/splat-transform_for_lcc",
-  "repository": "https://github.com/Shuang-su/splat-transform_for_lcc",
+  "homepage": "https://github.com/Shuang-su/splat-transform-workflow-for-lcc",
+  "repository": "https://github.com/Shuang-su/splat-transform-workflow-for-lcc",
   "license": "MIT",
   "keywords": [
     "supersplat",
@@ -38,7 +38,7 @@
       "Interactive",
       "Write"
     ],
-    "websiteURL": "https://github.com/Shuang-su/splat-transform_for_lcc",
+    "websiteURL": "https://github.com/Shuang-su/splat-transform-workflow-for-lcc",
     "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
     "termsOfServiceURL": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
     "defaultPrompt": [

@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT="$(cd "$(dirname "$0")" && pwd)"
-SKILL_NAME="supersplat-workflow"
+SKILL_NAME="splat-transform-workflow-for-lcc"
 TARGET="${CODEX_HOME:-$HOME/.codex}/skills/$SKILL_NAME"
 SOURCE="$ROOT/plugins/splat-transform-for-lcc/skills/$SKILL_NAME"
 
