@@ -1,6 +1,6 @@
 {
   "name": "splat-transform-for-lcc",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Convert LCC/PLY Gaussian splat scenes into SuperSplat streamed LOD, SOG, and voxel outputs with bilingual guidance.",
   "author": {
     "name": "szmg",
@@ -20,7 +20,9 @@
     "gaussian-splatting",
     "multilingual",
     "zh-CN",
-    "skillhub",
+    "openclaw",
+    "clawhub",
+    "tencent-skillhub",
     "viewer",
     "codex"
   ],

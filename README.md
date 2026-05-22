@@ -7,7 +7,7 @@ It includes:
 - a modified `supersplat-viewer` source tree
 - versioned `splat-transform` source trees for legacy 1.9.2 and current 2.1.1 workflows
 - a repo-local Codex plugin and skill
-- a top-level standalone skill copy for SkillHub-style scanners
+- a top-level standalone skill copy for ClawHub/Tencent SkillHub-style scanners
 - helper scripts for scene conversion, settings merge, and viewer mounting
 - two ready-to-open demos: `baoan` and `dashi`
 
@@ -205,7 +205,7 @@ That creates a symlink at `~/.codex/skills/supersplat-workflow`.
    - `node`
    - local dependencies installed for the copied `supersplat-viewer` and whichever `splat-transform-*` version you run
 
-## Publish to SkillHub or other skill platforms
+## Publish to ClawHub / Tencent SkillHub
 
 The plugin skill is stored at:
 
@@ -219,16 +219,21 @@ For platforms that scan a repo-level skill directory, the same content is mirror
 skills/supersplat-workflow/SKILL.md
 ```
 
-SkillHub CLI publishing can use:
+ClawHub is the publishing registry for OpenClaw skills. Tencent SkillHub is treated here as the China-optimized discovery and mirror layer for ClawHub content, so publish to ClawHub first and then verify whether the listing appears in Tencent SkillHub or submit through Tencent's web/community flow when that entry is available.
+
+ClawHub CLI publishing can use:
 
 ```bash
-npx @skills-hub-ai/cli login
-npx @skills-hub-ai/cli publish skills/supersplat-workflow/SKILL.md \
-  --github-repo https://github.com/Shuang-su/splat-transform_for_lcc \
-  --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN
+npm_config_cache=/tmp/codex-npm-cache npx clawhub login
+npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish skills/supersplat-workflow \
+  --slug supersplat-workflow \
+  --name "SuperSplat Workflow / LCC 转 SuperSplat" \
+  --version 0.2.1 \
+  --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN \
+  --changelog "Add bilingual glossary, LCC/SuperSplat concept explanations, and PLY-first conversion guidance."
 ```
 
-The GitHub repo is the source of truth. Platform account login, ownership verification, and final public listing submission must be completed in the target platform's web or authenticated CLI flow.
+The GitHub repo is the source of truth. Platform account login, ownership verification, Tencent SkillHub mirror status, and final public listing submission must be completed in the target platform's authenticated flow.
 
 ## Included demos
 
