@@ -1,14 +1,6 @@
 ---
 name: splat-transform-workflow-for-lcc
 description: Use when converting XGRIDS/其域 `.lcc` or PLY Gaussian splat scenes for SuperSplat, producing streamed LOD, SOG, voxel collision data, merging viewer settings, mounting local routes, or explaining LCC/SuperSplat workflow concepts to Chinese or English users.
-version: 0.2.2
-metadata:
-  openclaw:
-    homepage: https://github.com/Shuang-su/splat-transform-workflow-for-lcc
-    requires:
-      bins:
-        - python3
-        - node
 ---
 
 # Splat Transform Workflow for LCC / LCC 转 SuperSplat 工作流
@@ -62,7 +54,7 @@ Use this skill when a user needs to:
 - Merge a simple `settings.json` with a version 2 settings JSON.
 - Mount streamed LOD, SOG, and voxel files into `supersplat-viewer/public/<scene>`.
 - Explain why PLY, LCC, SOG, streamed LOD, and voxel outputs are different.
-- Package or publish this workflow as a reusable Codex/OpenClaw/ClawHub skill.
+- Reuse this workflow from a repo-local Codex skill or a top-level `skills/` directory.
 
 ## Coordinate-Space Rules / 坐标规则
 
@@ -201,9 +193,8 @@ The mount step creates:
 
 The route redirects to the root viewer with `settings`, `content`, and `voxel` query params. Do not append a `voxelRotation` query param when using baked PLY voxel output.
 
-## Publishing Notes / 发布说明
+## Skill Locations / Skill 文件位置
 
-- Keep this file usable as a standalone `SKILL.md`; ClawHub publishes from a skill folder that contains this file.
-- Keep the repo-local plugin metadata in `plugins/splat-transform-for-lcc/.codex-plugin/plugin.json` aligned with this skill.
-- The top-level `skills/splat-transform-workflow-for-lcc/SKILL.md` mirrors this plugin skill for scanners that expect a repository-level `skills/` directory.
-- Tencent SkillHub is treated as the China-optimized discovery/mirror layer for ClawHub content. Publish to ClawHub first, then verify whether SkillHub has mirrored or accepted the listing.
+- Plugin skill: `plugins/splat-transform-for-lcc/skills/splat-transform-workflow-for-lcc/SKILL.md`
+- Top-level copy: `skills/splat-transform-workflow-for-lcc/SKILL.md`
+- Keep these two files in sync when updating workflow guidance.

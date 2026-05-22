@@ -1,24 +1,23 @@
-# splat-transform-for-lcc
+# splat-transform-workflow-for-lcc
 
-This mono-repo packages the LCC-to-SuperSplat workflow we built in Codex so it can be cloned and reused on another machine.
+This mono-repo packages an LCC/PLY-to-SuperSplat workflow so it can be cloned and reused on another machine.
 
 It includes:
 
 - a modified `supersplat-viewer` source tree
 - versioned `splat-transform` source trees for legacy 1.9.2 and current 2.1.1 workflows
 - a repo-local Codex plugin and skill
-- a top-level standalone skill copy for ClawHub/Tencent SkillHub-style scanners
+- a top-level standalone skill copy for agents that scan `skills/`
 - helper scripts for scene conversion, settings merge, and viewer mounting
 - two ready-to-open demos: `baoan` and `dashi`
 
 ## Repo layout
 
 ```text
-splat-transform-for-lcc/
+splat-transform-workflow-for-lcc/
 ├── .agents/plugins/marketplace.json
 ├── docs/
 │   ├── thread-summary.md
-│   ├── skillhub-publishing.md
 │   ├── splat-transform-versions.md
 │   ├── upstream-lock.json
 │   └── workflow-reference.md
@@ -205,55 +204,19 @@ That creates a symlink at `~/.codex/skills/splat-transform-workflow-for-lcc`.
    - `node`
    - local dependencies installed for the copied `supersplat-viewer` and whichever `splat-transform-*` version you run
 
-## Publish to ClawHub / Tencent SkillHub
+## Skill files
 
-The plugin skill is stored at:
+The repo-local plugin skill is stored at:
 
 ```text
 plugins/splat-transform-for-lcc/skills/splat-transform-workflow-for-lcc/SKILL.md
 ```
 
-For platforms that scan a repo-level skill directory, the same content is mirrored at:
+The same content is mirrored for tools that scan a repo-level `skills/` directory:
 
 ```text
 skills/splat-transform-workflow-for-lcc/SKILL.md
 ```
-
-ClawHub is the publishing registry for OpenClaw skills. Tencent SkillHub is treated here as the China-optimized discovery and mirror layer for ClawHub content, so publish to ClawHub first and then verify whether the listing appears in Tencent SkillHub or submit through Tencent's web/community flow when that entry is available.
-
-ClawHub CLI publishing can use:
-
-```bash
-npm_config_cache=/tmp/codex-npm-cache npx clawhub login
-cd /path/to/splat-transform-workflow-for-lcc
-npm_config_cache=/tmp/codex-npm-cache npx clawhub \
-  --workdir "$PWD" \
-  skill publish skills/splat-transform-workflow-for-lcc \
-  --slug splat-transform-workflow-for-lcc \
-  --name "Splat Transform Workflow for LCC / LCC 转 SuperSplat" \
-  --version 0.2.2 \
-  --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN \
-  --changelog "Add bilingual glossary, LCC/SuperSplat concept explanations, and PLY-first conversion guidance."
-```
-
-If you are already in another working directory, pass the absolute skill folder path instead:
-
-```bash
-REPO_DIR=/path/to/splat-transform-workflow-for-lcc
-npm_config_cache=/tmp/codex-npm-cache npx clawhub \
-  --workdir "$REPO_DIR" \
-  skill publish "$REPO_DIR/skills/splat-transform-workflow-for-lcc" \
-  --slug splat-transform-workflow-for-lcc \
-  --name "Splat Transform Workflow for LCC / LCC 转 SuperSplat" \
-  --version 0.2.2 \
-  --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN
-```
-
-The explicit `--workdir` is intentional. ClawHub may resolve relative paths against an OpenClaw default workspace instead of the shell's current directory.
-
-The GitHub repo is the source of truth. Platform account login, ownership verification, Tencent SkillHub mirror status, and final public listing submission must be completed in the target platform's authenticated flow.
-
-Tencent's `skillhub.cn` installer currently provides a local search/install CLI (`search`, `install`, `upgrade`, `list`, `login`, `logout`, `config`) and does not expose a public `publish` command. Publish through ClawHub first, then verify Tencent SkillHub search/mirror status.
 
 ## Included demos
 

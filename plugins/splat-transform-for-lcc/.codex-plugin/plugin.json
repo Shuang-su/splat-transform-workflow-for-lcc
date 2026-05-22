@@ -3,7 +3,7 @@
   "version": "0.2.2",
   "description": "Convert LCC/PLY Gaussian splat scenes into SuperSplat streamed LOD, SOG, and voxel outputs with bilingual guidance.",
   "author": {
-    "name": "szmg",
+    "name": "Shuang-su",
     "email": "noreply@example.com",
     "url": "https://github.com/Shuang-su"
   },
@@ -32,7 +32,7 @@
     "displayName": "Splat Transform for LCC / LCC 转 SuperSplat",
     "shortDescription": "Convert LCC/PLY scenes into SuperSplat SOG, streamed LOD, voxel, and viewer routes.",
     "longDescription": "Use this bilingual plugin to convert XGRIDS or 其域 LCC and original PLY Gaussian splat scenes into SuperSplat assets. It explains LCC, SuperSplat, SOG, streamed LOD, voxel collision, and version-specific coordinate defaults; prefers PLY for high-precision SOG/voxel output; uses LCC for true streamed multi-LOD output; merges v1/v2 settings JSON; and mounts scenes into a local SuperSplat viewer route.",
-    "developerName": "szmg",
+    "developerName": "Shuang-su",
     "category": "Coding",
     "capabilities": [
       "Interactive",
