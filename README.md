@@ -224,6 +224,7 @@ ClawHub is the publishing registry for OpenClaw skills. Tencent SkillHub is trea
 ClawHub CLI publishing can use:
 
 ```bash
+cd /Users/szmg/Documents/codex-supersplat-workflow
 npm_config_cache=/tmp/codex-npm-cache npx clawhub login
 npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish skills/supersplat-workflow \
   --slug supersplat-workflow \
@@ -231,6 +232,16 @@ npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish skills/superspla
   --version 0.2.1 \
   --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN \
   --changelog "Add bilingual glossary, LCC/SuperSplat concept explanations, and PLY-first conversion guidance."
+```
+
+If you are already in another working directory, pass the absolute skill folder path instead:
+
+```bash
+npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish /Users/szmg/Documents/codex-supersplat-workflow/skills/supersplat-workflow \
+  --slug supersplat-workflow \
+  --name "SuperSplat Workflow / LCC 转 SuperSplat" \
+  --version 0.2.1 \
+  --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN
 ```
 
 The GitHub repo is the source of truth. Platform account login, ownership verification, Tencent SkillHub mirror status, and final public listing submission must be completed in the target platform's authenticated flow.

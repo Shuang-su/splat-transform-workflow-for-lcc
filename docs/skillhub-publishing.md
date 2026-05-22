@@ -34,6 +34,7 @@ This skill helps users convert LCC/PLY Gaussian splat scenes into deployable Sup
 The official ClawHub CLI publishes a skill from a folder, not from an isolated `SKILL.md` file:
 
 ```bash
+cd /Users/szmg/Documents/codex-supersplat-workflow
 npm_config_cache=/tmp/codex-npm-cache npx clawhub login
 npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish skills/supersplat-workflow \
   --slug supersplat-workflow \
@@ -43,9 +44,20 @@ npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish skills/superspla
   --changelog "Add bilingual glossary, LCC/SuperSplat concept explanations, and PLY-first conversion guidance."
 ```
 
+If your shell is in another directory, pass the absolute skill folder path:
+
+```bash
+npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish /Users/szmg/Documents/codex-supersplat-workflow/skills/supersplat-workflow \
+  --slug supersplat-workflow \
+  --name "SuperSplat Workflow / LCC 转 SuperSplat" \
+  --version 0.2.1 \
+  --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN
+```
+
 If publishing under an organization or publisher handle:
 
 ```bash
+cd /Users/szmg/Documents/codex-supersplat-workflow
 npm_config_cache=/tmp/codex-npm-cache npx clawhub skill publish skills/supersplat-workflow \
   --owner <publisher-handle> \
   --slug supersplat-workflow \
