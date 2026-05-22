@@ -1,4 +1,4 @@
 interface:
-  display_name: "SuperSplat Workflow"
-  short_description: "Convert LCC scenes, explain defaults, merge settings, and mount local viewer routes."
-  default_prompt: "Convert this LCC scene with the default workflow, explain the default rotation and voxel parameters, merge the settings JSON files if needed, and mount the result into a local SuperSplat viewer route."
+  display_name: "SuperSplat Workflow / LCC 转 SuperSplat"
+  short_description: "Bilingual LCC/PLY to SuperSplat workflow with SOG, streamed LOD, voxel, and settings guidance."
+  default_prompt: "先解释 LCC、SuperSplat、SOG、streamed LOD、voxel 的含义和这个 skill 的价值，再按默认工作流转换 LCC/PLY 场景、说明 rotation 和 voxel 参数、合并 settings，并挂载到本地 SuperSplat viewer route。"

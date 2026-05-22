@@ -1,7 +1,7 @@
 {
   "name": "szmg-local",
   "interface": {
-    "displayName": "szmg Local Plugins"
+    "displayName": "szmg Local Plugins / 本地插件"
   },
   "plugins": [
     {

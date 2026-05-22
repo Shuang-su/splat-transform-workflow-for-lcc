@@ -1,7 +1,7 @@
 {
   "name": "splat-transform-for-lcc",
-  "version": "0.1.0",
-  "description": "Convert LCC scenes into SuperSplat streamed LOD and voxel outputs, merge settings, and mount local viewer routes.",
+  "version": "0.2.0",
+  "description": "Convert LCC/PLY Gaussian splat scenes into SuperSplat streamed LOD, SOG, and voxel outputs with bilingual guidance.",
   "author": {
     "name": "szmg",
     "email": "noreply@example.com",
@@ -13,16 +13,23 @@
   "keywords": [
     "supersplat",
     "lcc",
+    "sog",
+    "ply",
+    "streamed-lod",
+    "voxel",
     "gaussian-splatting",
+    "multilingual",
+    "zh-CN",
+    "skillhub",
     "viewer",
     "codex"
   ],
   "skills": "./skills/",
   "apps": "./.app.json",
   "interface": {
-    "displayName": "Splat Transform for LCC",
-    "shortDescription": "Convert LCC scenes, merge settings, and mount local viewer routes.",
-    "longDescription": "Use this plugin to convert XGRIDS or 其域 LCC scenes into SuperSplat streamed LOD and voxel outputs, merge v1 and v2 settings JSON files, preserve or strip environment data, and mount scenes into a local SuperSplat viewer route.",
+    "displayName": "Splat Transform for LCC / LCC 转 SuperSplat",
+    "shortDescription": "Convert LCC/PLY scenes into SuperSplat SOG, streamed LOD, voxel, and viewer routes.",
+    "longDescription": "Use this bilingual plugin to convert XGRIDS or 其域 LCC and original PLY Gaussian splat scenes into SuperSplat assets. It explains LCC, SuperSplat, SOG, streamed LOD, voxel collision, and version-specific coordinate defaults; prefers PLY for high-precision SOG/voxel output; uses LCC for true streamed multi-LOD output; merges v1/v2 settings JSON; and mounts scenes into a local SuperSplat viewer route.",
     "developerName": "szmg",
     "category": "Coding",
     "capabilities": [
@@ -33,7 +40,10 @@
     "privacyPolicyURL": "https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement",
     "termsOfServiceURL": "https://docs.github.com/en/site-policy/github-terms/github-terms-of-service",
     "defaultPrompt": [
+      "解释 LCC、SuperSplat、SOG、streamed LOD 和 voxel 的区别，并用默认工作流转换这个场景。",
+      "用中文说明这个 LCC/PLY 转 SuperSplat skill 的作用和价值，然后生成 SOG、streamed LOD 和 voxel 输出。",
       "Convert this LCC scene into streamed LOD and voxel output with the default workflow.",
+      "Convert this PLY into high-precision SOG and voxel outputs for SuperSplat.",
       "Merge these settings JSON files into a version 2 viewer settings file.",
       "Mount this converted scene into a local SuperSplat viewer route."
     ],

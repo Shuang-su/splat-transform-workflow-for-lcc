@@ -7,6 +7,7 @@ It includes:
 - a modified `supersplat-viewer` source tree
 - versioned `splat-transform` source trees for legacy 1.9.2 and current 2.1.1 workflows
 - a repo-local Codex plugin and skill
+- a top-level standalone skill copy for SkillHub-style scanners
 - helper scripts for scene conversion, settings merge, and viewer mounting
 - two ready-to-open demos: `baoan` and `dashi`
 
@@ -17,6 +18,7 @@ splat-transform-for-lcc/
 ├── .agents/plugins/marketplace.json
 ├── docs/
 │   ├── thread-summary.md
+│   ├── skillhub-publishing.md
 │   ├── splat-transform-versions.md
 │   ├── upstream-lock.json
 │   └── workflow-reference.md
@@ -30,10 +32,35 @@ splat-transform-for-lcc/
 │       │   └── scene_workflow.py
 │       └── skills/
 │           └── supersplat-workflow/
+├── skills/
+│   └── supersplat-workflow/
 ├── splat-transform-1.9.2/
 ├── splat-transform-2.1.1/
 └── supersplat-viewer/
 ```
+
+## What this workflow is for / 这个工作流的价值
+
+This workflow converts trained or vendor-delivered Gaussian splat scenes into deployable SuperSplat viewer assets. It is designed for the practical split between precision and delivery:
+
+- use original PLY for high-precision SOG and voxel output when available
+- use LCC for true streamed multi-LOD output
+- preserve viewer settings and route wiring so the scene can be opened directly in `supersplat-viewer`
+- apply version-aware rotations so visual splats and voxel collision stay aligned
+
+中文概括：这个仓库解决的不是单个格式转换命令，而是把 LCC/PLY 高斯泼溅资产稳定变成 SuperSplat 网页可用资产。它会解释格式差异、选择更高精度的输入源、处理 1.9.2/2.x 坐标差异，并把 `scene.sog`、`lod-meta.json`、`walk.voxel.json`、settings 和 viewer route 串起来。
+
+## Glossary / 名词解释
+
+- `LCC`: XGRIDS/其域场景容器。这里主要把它当作真实多层级 streamed LOD 的来源；它可以包含多层 LOD 和环境层，但属性可能已经被压缩或量化。
+- `SuperSplat`: PlayCanvas 的高斯泼溅编辑器/查看器生态。这个仓库的输出最终是给 SuperSplat viewer 加载的 SOG、streamed LOD、settings 和 voxel route。
+- `PLY`: 常见的训练输出/原始高斯属性文件。通常保留 float32 属性，适合作为高精度 `scene.sog` 和 `walk.voxel.json` 来源。
+- `SOG`: Super-compressed Gaussian splat，SuperSplat 使用的紧凑高斯泼溅资产格式，常见输出是 `scene.sog` 或 `meta.json` 加二进制块。
+- `streamed LOD`: 流式多层级输出，以 `lod-meta.json` 为入口，适合大场景渐进加载。
+- `voxel`: 体素碰撞数据，通常是 `walk.voxel.json` 加 `walk.voxel.bin`，用于行走和碰撞，不是视觉 splat 本身。
+- `splat-transform`: 转换 CLI。本仓库保留 `splat-transform-1.9.2/` 和 `splat-transform-2.1.1/`，因为 LCC 坐标处理和 voxel 参数在 2.x 发生了变化。
+- `LOD0`: 最精细主层级，旧 LCC voxel 流程里常作为体素来源。
+- `meta.json.version`: 输出数据格式版本，不是 `splat-transform` CLI 版本。
 
 ## splat-transform versions
 
@@ -177,6 +204,31 @@ That creates a symlink at `~/.codex/skills/supersplat-workflow`.
    - `python3`
    - `node`
    - local dependencies installed for the copied `supersplat-viewer` and whichever `splat-transform-*` version you run
+
+## Publish to SkillHub or other skill platforms
+
+The plugin skill is stored at:
+
+```text
+plugins/splat-transform-for-lcc/skills/supersplat-workflow/SKILL.md
+```
+
+For platforms that scan a repo-level skill directory, the same content is mirrored at:
+
+```text
+skills/supersplat-workflow/SKILL.md
+```
+
+SkillHub CLI publishing can use:
+
+```bash
+npx @skills-hub-ai/cli login
+npx @skills-hub-ai/cli publish skills/supersplat-workflow/SKILL.md \
+  --github-repo https://github.com/Shuang-su/splat-transform_for_lcc \
+  --tags supersplat,lcc,sog,ply,voxel,gaussian-splatting,zh-CN
+```
+
+The GitHub repo is the source of truth. Platform account login, ownership verification, and final public listing submission must be completed in the target platform's web or authenticated CLI flow.
 
 ## Included demos
 
