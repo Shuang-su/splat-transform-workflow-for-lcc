@@ -12,9 +12,9 @@ This document records the exact workflow conventions used in this repo.
 - `--splat-transform = splat-transform-2.1.1`
   The script prefers the repo-local 2.1.1 tree when `SPLAT_TRANSFORM_DIR` and `--splat-transform` are not set.
 - `--stream-rotation auto`
-  LCC on 2.x uses no extra `-r`; legacy LCC and PLY use `90,0,0`.
+  LCC on 2.x uses no extra `-r`; PLY on 2.x uses `-90,0,0`; legacy LCC and PLY use `90,0,0`.
 - `--sog-rotation auto`
-  PLY uses `90,0,0`; LCC on 2.x uses no extra `-r`.
+  PLY on 2.x uses `-90,0,0`; LCC on 2.x uses no extra `-r`; legacy PLY uses `90,0,0`.
 - `--voxel-rotation auto`
   PLY on 2.x uses `-90,0,180`; legacy inputs use `90,0,0`.
 - `voxel size = 0.08`
@@ -29,7 +29,7 @@ This document records the exact workflow conventions used in this repo.
 - `splat-transform-2.1.1/`
   Current default for new conversions.
 
-The 2.x LCC reader marks LCC data with an internal `90,0,180` source transform. That is why 2.x LCC streamed output should not also receive the old `-r 90,0,0`. PLY is different: PLY remains a PLY-space source, so this workflow still uses `input.ply -r 90,0,0 output/scene.sog` for PLY-derived SOG.
+The 2.x LCC reader marks LCC data with an internal `90,0,180` source transform. That is why 2.x LCC streamed output should not also receive the old `-r 90,0,0`. PLY is different: PLY remains a PLY-space source, and this workflow uses `input.ply -r -90,0,0 output/scene.sog` for 2.x PLY-derived SOG and `input.ply -l 0 -r -90,0,0 output/lod-meta.json` for 2.x PLY-derived streamed LOD.
 
 Voxel CLI parameters also differ:
 
@@ -39,6 +39,10 @@ splat-transform -O 0 -R 0.08 -A 0.20 input.lcc -r 90,0,0 output/walk.voxel.json
 
 # 2.1.1 PLY baked voxel
 splat-transform --voxel-params 0.08,0.20 input.ply -r -90,0,180 output/walk.voxel.json
+
+# 2.1.1 PLY SOG / single-layer streamed LOD
+splat-transform input.ply -r -90,0,0 output/scene.sog
+splat-transform input.ply -l 0 -r -90,0,0 output/lod-meta.json
 ```
 
 ## Important `splat-transform` CLI rule
@@ -48,7 +52,7 @@ Per-file transforms must be written after the input file they belong to.
 Correct:
 
 ```bash
-node splat-transform-2.1.1/bin/cli.mjs input.ply -r 90,0,0 output/scene.sog
+node splat-transform-2.1.1/bin/cli.mjs input.ply -r -90,0,0 output/scene.sog
 ```
 
 Incorrect:

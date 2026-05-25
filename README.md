@@ -70,10 +70,11 @@ This repo keeps both transform sources intentionally:
 - `splat-transform-1.9.2/` is the legacy reference used by the original workflow.
 - `splat-transform-2.1.1/` is the default for new conversions and is preferred by `scene_workflow.py` when `--splat-transform` is omitted.
 
-The important workflow difference is that `splat-transform` 2.x reads LCC with an internal `90,0,180` source transform. Do not add the old LCC `-r 90,0,0` on top of 2.x LCC streamed output. PLY does not use that LCC-specific correction, so PLY-derived SOG still uses:
+The important workflow difference is that `splat-transform` 2.x reads LCC with an internal `90,0,180` source transform. Do not add the old LCC `-r 90,0,0` on top of 2.x LCC streamed output. PLY does not use that LCC-specific correction; in this workflow, 2.x PLY-derived SOG and PLY-derived streamed LOD use baked `-r -90,0,0`:
 
 ```bash
-input.ply -r 90,0,0 output/scene.sog
+input.ply -r -90,0,0 output/scene.sog
+input.ply -l 0 -r -90,0,0 output/lod-meta.json
 ```
 
 More detail is recorded in [docs/splat-transform-versions.md](docs/splat-transform-versions.md).
@@ -97,9 +98,9 @@ By default it:
 ### Parameter Meanings
 
 - `--stream-rotation auto`
-  LCC on 2.x uses no extra `-r`; legacy LCC and PLY use `90,0,0`.
+  LCC on 2.x uses no extra `-r`; PLY on 2.x uses `-90,0,0`; legacy LCC and PLY use `90,0,0`.
 - `--sog-rotation auto`
-  PLY uses `90,0,0`; LCC on 2.x uses no extra `-r`.
+  PLY on 2.x uses `-90,0,0`; LCC on 2.x uses no extra `-r`; legacy PLY uses `90,0,0`.
 - `--voxel-rotation auto`
   PLY on 2.x uses `-90,0,180`; legacy inputs use `90,0,0`.
 - `--voxel-lod 0`
@@ -112,7 +113,7 @@ By default it:
 Per-file `splat-transform` transforms must be written after the input file they apply to:
 
 ```bash
-node splat-transform-2.1.1/bin/cli.mjs input.ply -r 90,0,0 output/scene.sog
+node splat-transform-2.1.1/bin/cli.mjs input.ply -r -90,0,0 output/scene.sog
 ```
 
 ### Common Commands
@@ -270,10 +271,11 @@ splat-transform-workflow-for-lcc/
 - `splat-transform-1.9.2/` 是旧流程的复现参考。
 - `splat-transform-2.1.1/` 是新转换的默认版本；没有显式传 `--splat-transform` 时，`scene_workflow.py` 会优先使用它。
 
-关键差异是：`splat-transform` 2.x 的 LCC reader 内部带 `90,0,180` source transform。因此 2.x LCC streamed 输出不要再叠加旧的 `-r 90,0,0`。PLY 不适用这个 LCC 专属修正，所以 PLY 生成 SOG 仍然使用：
+关键差异是：`splat-transform` 2.x 的 LCC reader 内部带 `90,0,180` source transform。因此 2.x LCC streamed 输出不要再叠加旧的 `-r 90,0,0`。PLY 不适用这个 LCC 专属修正；本工作流里，2.x PLY 生成 SOG 和 PLY 生成 streamed LOD 都使用烘焙外参 `-r -90,0,0`：
 
 ```bash
-input.ply -r 90,0,0 output/scene.sog
+input.ply -r -90,0,0 output/scene.sog
+input.ply -l 0 -r -90,0,0 output/lod-meta.json
 ```
 
 更多细节见 [docs/splat-transform-versions.md](docs/splat-transform-versions.md)。
@@ -297,9 +299,9 @@ python3 plugins/splat-transform-for-lcc/scripts/scene_workflow.py deploy-scene .
 ### 参数含义
 
 - `--stream-rotation auto`
-  2.x LCC 不额外加 `-r`；legacy LCC 和 PLY 使用 `90,0,0`。
+  2.x LCC 不额外加 `-r`；2.x PLY 使用 `-90,0,0`；legacy LCC 和 PLY 使用 `90,0,0`。
 - `--sog-rotation auto`
-  PLY 使用 `90,0,0`；2.x LCC 不额外加 `-r`。
+  2.x PLY 使用 `-90,0,0`；2.x LCC 不额外加 `-r`；legacy PLY 使用 `90,0,0`。
 - `--voxel-rotation auto`
   2.x PLY 使用 `-90,0,180`；legacy 输入使用 `90,0,0`。
 - `--voxel-lod 0`
@@ -312,7 +314,7 @@ python3 plugins/splat-transform-for-lcc/scripts/scene_workflow.py deploy-scene .
 `splat-transform` 的单文件 transform 参数必须写在对应 input 文件后面：
 
 ```bash
-node splat-transform-2.1.1/bin/cli.mjs input.ply -r 90,0,0 output/scene.sog
+node splat-transform-2.1.1/bin/cli.mjs input.ply -r -90,0,0 output/scene.sog
 ```
 
 ### 常用命令

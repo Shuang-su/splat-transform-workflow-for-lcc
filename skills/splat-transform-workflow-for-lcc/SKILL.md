@@ -60,12 +60,12 @@ Use this skill when a user needs to:
 
 - PLY, SOG, SPZ, KSplat, and splat inputs are PLY-space sources.
 - In `splat-transform` 2.x, LCC is read with an internal source transform of `90,0,180`; do not blindly add the old LCC `90,0,0` rotation on top of it.
-- PLY did not receive that LCC-specific reader correction. If old `PLY -> SOG` conversion needed `-r 90,0,0` for viewer alignment, keep using it.
+- PLY did not receive that LCC-specific reader correction. In this workflow, `splat-transform` 2.x PLY -> SOG and PLY -> streamed LOD use baked `-r -90,0,0`.
 - `meta.json.version: 2` is the output data format version, not the `splat-transform` CLI version.
 - Per-file transforms must come after the input file:
 
 ```bash
-splat-transform input.ply -r 90,0,0 -t 0,0,0 output.sog
+splat-transform input.ply -r -90,0,0 -t 0,0,0 output.sog
 ```
 
 ## Preferred Defaults / 推荐默认策略
@@ -74,8 +74,8 @@ splat-transform input.ply -r 90,0,0 -t 0,0,0 output.sog
 - Streamed source: LCC for true multi-LOD streamed output.
 - SOG source: original PLY when available.
 - Voxel source: original PLY when available.
-- `--stream-rotation auto`: LCC on 2.x uses no extra `-r`; legacy LCC and PLY use `90,0,0`.
-- `--sog-rotation auto`: PLY uses `90,0,0`; LCC on 2.x uses no extra `-r`.
+- `--stream-rotation auto`: LCC on 2.x uses no extra `-r`; PLY on 2.x uses `-90,0,0`; legacy LCC and PLY use `90,0,0`.
+- `--sog-rotation auto`: PLY on 2.x uses `-90,0,0`; LCC on 2.x uses no extra `-r`; legacy PLY uses `90,0,0`.
 - `--voxel-rotation auto`: PLY on 2.x uses `-90,0,180`; legacy inputs use `90,0,0`.
 - Voxel defaults: size `0.08`, opacity threshold `0.20`.
 - Mounted voxel names: `walk.voxel.json` and `walk.voxel.bin`.
@@ -131,7 +131,8 @@ Use the base v2 file when you need to preserve annotations, post effects, tonema
 For `splat-transform` 2.x with original PLY:
 
 ```bash
-splat-transform input.ply -r 90,0,0 output/scene.sog
+splat-transform input.ply -r -90,0,0 output/scene.sog
+splat-transform input.ply -l 0 -r -90,0,0 output/lod-meta.json
 splat-transform --voxel-params 0.08,0.20 input.ply -r -90,0,180 output/walk.voxel.json
 ```
 

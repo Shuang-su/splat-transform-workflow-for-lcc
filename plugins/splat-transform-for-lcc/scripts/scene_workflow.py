@@ -130,6 +130,8 @@ def effective_rotation(value: str, source_kind: str, output_kind: str, major: in
 
     if source_kind == "lcc" and major >= 2:
         return None
+    if source_kind == "ply" and major == 2 and output_kind in {"stream", "sog"}:
+        return "-90,0,0"
     return "90,0,0"
 
 
