@@ -125,7 +125,11 @@ def effective_rotation(value: str, source_kind: str, output_kind: str, major: in
 
     if output_kind == "voxel":
         if major >= 2:
-            return "-90,0,180" if source_kind == "ply" else None
+            if source_kind == "ply":
+                return "-90,0,180"
+            if source_kind == "lcc":
+                return "0,0,180"
+            return None
         return "90,0,0"
 
     if source_kind == "lcc" and major >= 2:

@@ -61,6 +61,7 @@ Use this skill when a user needs to:
 - PLY, SOG, SPZ, KSplat, and splat inputs are PLY-space sources.
 - In `splat-transform` 2.x, LCC is read with an internal source transform of `90,0,180`; do not blindly add the old LCC `90,0,0` rotation on top of it.
 - PLY did not receive that LCC-specific reader correction. In this workflow, `splat-transform` 2.x PLY -> SOG and PLY -> streamed LOD use baked `-r -90,0,0`.
+- For `splat-transform` 2.x LCC -> voxel, the empirically aligned single conversion rotation is `-r 0,0,180`. Do not infer this by multiplying only the explicit query rotations: the viewer's unrotated voxel path and explicit `voxelRotation=0,0,0` path differ because the viewer has a default content rotation of `0,0,180`.
 - `meta.json.version: 2` is the output data format version, not the `splat-transform` CLI version.
 - Per-file transforms must come after the input file:
 
@@ -71,15 +72,26 @@ splat-transform input.ply -r -90,0,0 -t 0,0,0 output.sog
 ## Preferred Defaults / 推荐默认策略
 
 - `--splat-transform`: repo-local `splat-transform-2.1.1/` when available, unless `SPLAT_TRANSFORM_DIR` or an explicit flag overrides it.
+- Prefer GPU. Run `splat-transform --list-gpus` first when possible, then pass `-g 0` for the first GPU adapter. Use `-g cpu` only when GPU enumeration or GPU conversion fails.
 - Streamed source: LCC for true multi-LOD streamed output.
 - SOG source: original PLY when available.
 - Voxel source: original PLY when available.
 - `--stream-rotation auto`: LCC on 2.x uses no extra `-r`; PLY on 2.x uses `-90,0,0`; legacy LCC and PLY use `90,0,0`.
 - `--sog-rotation auto`: PLY on 2.x uses `-90,0,0`; LCC on 2.x uses no extra `-r`; legacy PLY uses `90,0,0`.
-- `--voxel-rotation auto`: PLY on 2.x uses `-90,0,180`; legacy inputs use `90,0,0`.
+- `--voxel-rotation auto`: PLY on 2.x uses `-90,0,180`; LCC on 2.x uses `0,0,180`; legacy inputs use `90,0,0`.
 - Voxel defaults: size `0.08`, opacity threshold `0.20`.
 - Mounted voxel names: `walk.voxel.json` and `walk.voxel.bin`.
 - Mounted LOD directory name: `streamed`.
+
+2.x rotation table:
+
+```text
+LCC -> streamed: no extra -r
+PLY -> SOG:      -r -90,0,0
+PLY -> streamed: -r -90,0,0
+PLY -> voxel:    -r -90,0,180
+LCC -> voxel:    -r 0,0,180
+```
 
 ## Preferred Scripts / 推荐脚本
 
@@ -131,15 +143,21 @@ Use the base v2 file when you need to preserve annotations, post effects, tonema
 For `splat-transform` 2.x with original PLY:
 
 ```bash
-splat-transform input.ply -r -90,0,0 output/scene.sog
-splat-transform input.ply -l 0 -r -90,0,0 output/lod-meta.json
-splat-transform --voxel-params 0.08,0.20 input.ply -r -90,0,180 output/walk.voxel.json
+splat-transform -g 0 input.ply -r -90,0,0 output/scene.sog
+splat-transform -g 0 input.ply -l 0 -r -90,0,0 output/lod-meta.json
+splat-transform -g 0 --voxel-params 0.08,0.20 input.ply -r -90,0,180 output/walk.voxel.json
 ```
 
 For `splat-transform` 2.x with LCC streamed LOD:
 
 ```bash
-splat-transform input.lcc output/lod-meta.json
+splat-transform -g 0 input.lcc output/lod-meta.json
+```
+
+For `splat-transform` 2.x LCC voxel:
+
+```bash
+splat-transform -g 0 --lod-select 0 --voxel-params 0.08,0.20 input.lcc -r 0,0,180 output/walk.voxel.json
 ```
 
 For legacy 1.9.2 LCC:
@@ -192,7 +210,7 @@ The mount step creates:
 - `public/<scene>/voxel/walk.voxel.bin`
 - `public/<scene>/index.html`
 
-The route redirects to the root viewer with `settings`, `content`, and `voxel` query params. Do not append a `voxelRotation` query param when using baked PLY voxel output.
+The route redirects to the root viewer with `settings`, `content`, and `voxel` query params. Do not append a `voxelRotation` query param when using baked PLY voxel output. For 2.x LCC voxel, prefer the single baked conversion (`input.lcc -r 0,0,180`) instead of relying on a viewer-side `voxelRotation`.
 
 ## Skill Locations / Skill 文件位置
 

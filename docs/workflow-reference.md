@@ -16,7 +16,7 @@ This document records the exact workflow conventions used in this repo.
 - `--sog-rotation auto`
   PLY on 2.x uses `-90,0,0`; LCC on 2.x uses no extra `-r`; legacy PLY uses `90,0,0`.
 - `--voxel-rotation auto`
-  PLY on 2.x uses `-90,0,180`; legacy inputs use `90,0,0`.
+  PLY on 2.x uses `-90,0,180`; LCC on 2.x uses `0,0,180`; legacy inputs use `90,0,0`.
 - `voxel size = 0.08`
   Voxel resolution in meters. Lower values create denser and larger collision data.
 - `opacity threshold = 0.20`
@@ -40,9 +40,22 @@ splat-transform -O 0 -R 0.08 -A 0.20 input.lcc -r 90,0,0 output/walk.voxel.json
 # 2.1.1 PLY baked voxel
 splat-transform --voxel-params 0.08,0.20 input.ply -r -90,0,180 output/walk.voxel.json
 
+# 2.1.1 LCC baked voxel
+splat-transform --lod-select 0 --voxel-params 0.08,0.20 input.lcc -r 0,0,180 output/walk.voxel.json
+
 # 2.1.1 PLY SOG / single-layer streamed LOD
 splat-transform input.ply -r -90,0,0 output/scene.sog
 splat-transform input.ply -l 0 -r -90,0,0 output/lod-meta.json
+```
+
+Current 2.x defaults:
+
+```text
+LCC -> streamed: no extra -r
+PLY -> SOG:      -r -90,0,0
+PLY -> streamed: -r -90,0,0
+PLY -> voxel:    -r -90,0,180
+LCC -> voxel:    -r 0,0,180
 ```
 
 ## Important `splat-transform` CLI rule

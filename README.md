@@ -102,7 +102,7 @@ By default it:
 - `--sog-rotation auto`
   PLY on 2.x uses `-90,0,0`; LCC on 2.x uses no extra `-r`; legacy PLY uses `90,0,0`.
 - `--voxel-rotation auto`
-  PLY on 2.x uses `-90,0,180`; legacy inputs use `90,0,0`.
+  PLY on 2.x uses `-90,0,180`; LCC on 2.x uses `0,0,180`; legacy inputs use `90,0,0`.
 - `--voxel-lod 0`
   Selects the legacy LCC voxel source level when voxel input is LCC.
 - `--voxel-resolution 0.08`
@@ -114,6 +114,16 @@ Per-file `splat-transform` transforms must be written after the input file they 
 
 ```bash
 node splat-transform-2.1.1/bin/cli.mjs input.ply -r -90,0,0 output/scene.sog
+```
+
+Current 2.x defaults:
+
+```text
+LCC -> streamed: no extra -r
+PLY -> SOG:      -r -90,0,0
+PLY -> streamed: -r -90,0,0
+PLY -> voxel:    -r -90,0,180
+LCC -> voxel:    -r 0,0,180
 ```
 
 ### Common Commands
@@ -303,7 +313,7 @@ python3 plugins/splat-transform-for-lcc/scripts/scene_workflow.py deploy-scene .
 - `--sog-rotation auto`
   2.x PLY 使用 `-90,0,0`；2.x LCC 不额外加 `-r`；legacy PLY 使用 `90,0,0`。
 - `--voxel-rotation auto`
-  2.x PLY 使用 `-90,0,180`；legacy 输入使用 `90,0,0`。
+  2.x PLY 使用 `-90,0,180`；2.x LCC 使用 `0,0,180`；legacy 输入使用 `90,0,0`。
 - `--voxel-lod 0`
   当 voxel 输入是 LCC 时，选择旧流程里的 LCC 体素来源层级。
 - `--voxel-resolution 0.08`
@@ -315,6 +325,16 @@ python3 plugins/splat-transform-for-lcc/scripts/scene_workflow.py deploy-scene .
 
 ```bash
 node splat-transform-2.1.1/bin/cli.mjs input.ply -r -90,0,0 output/scene.sog
+```
+
+当前 2.x 默认参数表：
+
+```text
+LCC -> streamed: 不额外加 -r
+PLY -> SOG:      -r -90,0,0
+PLY -> streamed: -r -90,0,0
+PLY -> voxel:    -r -90,0,180
+LCC -> voxel:    -r 0,0,180
 ```
 
 ### 常用命令
